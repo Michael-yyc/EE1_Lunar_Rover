@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lunar Rover Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="dashboard">
+    <header>
+      <div>
+        <p class="label">PROJECT ZAMBAM</p>
+        <h1>Live Rock Analyses</h1>
+      </div>
+
+      <button id="connectButton">Connect</button>
+    </header>
+
+    <!-- AGE SECTION -->
+    <section class="section">
+      <h2 class="section-title">AGE Signal</h2>
+
+      <div class="age-panel">
+        <div>
+          <p class="mini-label">Connection Status</p>
+          <p id="ageStatus" class="status offline">Not Detected</p>
+        </div>
+
+        <div>
+          <p class="mini-label">AGE Value</p>
+          <p id="ageValue" class="main-value">---</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROCK ANALYSIS SECTION -->
+    <section class="section">
+      <h2 class="section-title">Rock Type</h2>
+
+      <div class="sensor-grid">
+        <div class="sensor-card">
+          <h3>IR Signal</h3>
+          <p id="irStatus" class="status offline">Not Detected</p>
+          <p id="irValue" class="sensor-value">---</p>
+        </div>
+
+        <div class="sensor-card">
+          <h3>Ultrasound Signal</h3>
+          <p id="ultrasoundStatus" class="status offline">Not Detected</p>
+          <p id="ultrasoundValue" class="sensor-value">---</p>
+        </div>
+
+        <div class="sensor-card">
+          <h3>Magnetic Signal</h3>
+          <p id="magneticStatus" class="status offline">Not Detected</p>
+          <p id="magneticValue" class="sensor-value">---</p>
+        </div>
+      </div>
+
+      <div class="rock-result">
+        <p class="mini-label">Determined Rock Type</p>
+        <p id="rockType" class="rock-type">---</p>
+      </div>
+    </section>
+
+    <section class="section">
+  <div class="table-header">
+    <h2 class="section-title">Stored Rock Data</h2>
+    <button id="clearRocksButton">Clear Stored Data</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Rock ID</th>
+        <th>Age</th>
+        <th>Type</th>
+        <th>IR</th>
+        <th>Ultrasound</th>
+        <th>Magnetic</th>
+      </tr>
+    </thead>
+
+    <tbody id="rockTableBody">
+      <tr>
+        <td colspan="6" class="empty-table">No rocks stored yet</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+    <footer>
+      Last Update: <span id="lastUpdate">---</span>
+    </footer>
+  </main>
+
+  <script>
+    const connectButton = document.getElementById("connectButton");
+    const lastUpdate = document.getElementById("lastUpdate");
+
+    connectButton.addEventListener("click", connectDevice);
+
+    async function connectDevice() {
+      if (!("serial" in navigator)) {
+        alert("Web Serial is not supported. Use Chrome or Edge.");
+        return;
+      }
+
+      try {
+        const port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+
+        connectButton.textContent = "Connected";
+        connectButton.disabled = true;
+
+        const decoder = new TextDecoderStream();
+        port.readable.pipeTo(decoder.writable);
+
+        const reader = decoder.readable.getReader();
+        let buffer = "";
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += value;
+
+          const lines = buffer.split("\n");
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            handleData(line.trim());
+          }
+        }
+      } catch (error) {
+        alert("Connection failed: " + error.message);
+      }
+    }
+
+    function handleData(line) {
+      if (!line) return;
+
+      try {
+        const data = JSON.parse(line);
+
+        updateSignal("age", data.age);
+
+        updateSignal("ir", data.rock?.ir);
+        updateSignal("ultrasound", data.rock?.ultrasound);
+        updateSignal("magnetic", data.rock?.magnetic);
+
+        document.getElementById("rockType").textContent = data.rock?.type ?? "---";
+        lastUpdate.textContent = new Date().toLocaleTimeString();
+      } catch {
+        console.log("Invalid JSON:", line);
+      }
+    }
+
+    function updateSignal(name, signalData) {
+      const statusElement = document.getElementById(`${name}Status`);
+      const valueElement = document.getElementById(`${name}Value`);
+
+      if (!signalData || signalData.detected === false) {
+        statusElement.textContent = "Not Detected";
+        statusElement.className = "status offline";
+        valueElement.textContent = "---";
+        return;
+      }
+
+      statusElement.textContent = "Detected";
+      statusElement.className = "status online";
+      valueElement.textContent = signalData.value ?? "---";
+    }
+  </script>
+</body>
+</html>
