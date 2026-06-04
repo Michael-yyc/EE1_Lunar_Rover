@@ -1,16 +1,22 @@
 #define USE_WIFI_NINA         false
 #define USE_WIFI101           true
 #include <WiFiWebServer.h>
-#include <motor_control.cpp>
+#include <WiFiUdp.h>
+#include <ArduinoMDNS.h>
 #include <webpage.cpp>
+#include <motor_control.cpp>
+#include <magnetic.cpp>
 
 
 const char ssid[] = "AndroidAP";
 const char pass[] = "chizz12345678";
 const int groupNumber = 0; //only use to set IP address for EEERover network
+const char hostname[] = "ZAMBAM";
 
 
 WiFiWebServer server(80);
+WiFiUDP udp;
+MDNS mdns(udp);
 
 
 //Return the web page
@@ -54,15 +60,6 @@ void setup_server() {
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, 0);
 
-    Serial.begin(9600);
-
-    //Wait 10s for the serial connection before proceeding
-    //This ensures you can see messages from startup() on the monitor
-    //Remove this for faster startup when the USB host isnt attached
-    while (!Serial && millis() < 10000);  
-
-    Serial.println(F("\nStarting Web Server"));
-
     //Check WiFi shield is present
     if (WiFi.status() == WL_NO_SHIELD) {
         Serial.println(F("WiFi shield not present"));
@@ -92,16 +89,24 @@ void setup_server() {
     server.on(F("/L"), left);
     server.on(F("/R"), right);
     server.on(F("/S"), stop);
+    server.on(F("/magnetic"), magnetic_scan);
     server.onNotFound(handleNotFound);
 
     server.begin();
+    mdns.begin(WiFi.localIP(), hostname); //fixes root url to http://ZAMBAM.local/
 
-    Serial.print(F("HTTP server started @ "));
-    Serial.println(static_cast<IPAddress>(WiFi.localIP()));
+    Serial.println(F("HTTP server started @ "));
+    Serial.print(F("http://"));
+    Serial.print(hostname);
+    Serial.println(F(".local"));
+
+    Serial.print(F("IP address: "));
+    Serial.println(WiFi.localIP());
 }
 
 
 //Server polling function
 void handle_server_client() {
+    mdns.run();
     server.handleClient();
 }
