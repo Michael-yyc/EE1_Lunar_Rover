@@ -15,12 +15,11 @@ Features:
 */
 
 #include <Arduino.h>
+#include <magnetic.h>
 
 const int mag_pin = A0;
 const int num_samples = 100; // averaging amount
 const int threshold = 125; // sensitivity threshold (ADC counts) -> ~ 0.1V
-int baseline;
-
 
 // function to average 100 readings
 int average_reading() {
@@ -42,16 +41,11 @@ int get_magnetic_baseline() {
     Serial.begin(115200);
     while(!Serial) {};
 
-    baseline = average_reading();
-    double baseline_voltage = (baseline * 3.3) / 4095.0;
-
-    Serial.print("Baseline Voltage: ");
-    Serial.println(baseline_voltage);
+    return average_reading();
 }
 
 
-int magnetic_scan(int baseline) {
-
+int get_magnetic_direction(int baseline) {
     int reading = average_reading();
 
     int deviation = reading - baseline;
@@ -80,7 +74,4 @@ int magnetic_scan(int baseline) {
         Serial.print("   --> NO FIELD DETECTED");
         return 0;
     }
-
-    Serial.println();
-    delay(1000);
 }

@@ -3,9 +3,11 @@
 #include <WiFiWebServer.h>
 #include <WiFiUdp.h>
 #include <ArduinoMDNS.h>
-#include <webpage.cpp>
-#include <motor_control.cpp>
-#include <magnetic.cpp>
+#include <web_server.h>
+#include <webpage.h>
+#include <motor_control.h>
+#include <radio.h>
+#include <magnetic.h>
 
 
 const char ssid[] = "AndroidAP";
@@ -18,6 +20,7 @@ WiFiWebServer server(80);
 WiFiUDP udp;
 MDNS mdns(udp);
 
+extern int magnetic_baseline;
 
 //Return the web page
 void handleRoot() {
@@ -36,6 +39,24 @@ void ledOFF() {
     server.send(200, F("text/plain"), F("OFF"));
 }
 
+void age_scan() {
+    int age = get_age();
+    server.send(200, F("text/plain"), F(age));
+}
+
+void magnetic_scan() {
+    int field = get_magnetic_direction(magnetic_baseline);
+
+    if (field == 1) {
+        server.send(200, F("text/plain"), F("UP"));
+    }
+    else if (field == -1) {
+        server.send(200, F("text/plain"), F("DOWN"));
+    }
+    else {
+        server.send(200, F("text/plain"), F("NO FIELD DETECTED"));
+    }
+}
 
 //Generate a 404 response with details of the failed request
 void handleNotFound() {
@@ -89,6 +110,7 @@ void setup_server() {
     server.on(F("/L"), left);
     server.on(F("/R"), right);
     server.on(F("/S"), stop);
+    server.on(F("/age"), age_scan);
     server.on(F("/magnetic"), magnetic_scan);
     server.onNotFound(handleNotFound);
 

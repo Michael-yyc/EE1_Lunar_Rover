@@ -19,32 +19,28 @@ Features:
 #include <Arduino.h>
 
 char age[4];
-char c;
 
 void setup() {
     Serial.begin(115200);
     Serial1.begin(600);
-    age[3] = '\0'; //sets NULL character to indicate the end of the rock's age as a string
-    while(!Serial) {};
-    Serial.println("UART decoder ready: ");
+    age[3] = '\0';
 }
 
 void loop() {
-    if (Serial1.available()) {
-        c = Serial1.read();
-    }
+    while (Serial1.available()) {
+        char c = '\0';
 
-    if (c == '#') {
-        while (Serial1.available() < 3) {}; //wait until 3 bytes have been decoded
+        if (c != '#') {
+            c = Serial1.read();
 
-        Serial.println("detected a #");
-        for (int i = 0; i < 3; i++) {
-            age[i] = Serial1.read();
+            if (c == '#') {
+                while (Serial1.available() < 3) {}; //wait until 3 bytes have been decoded
+                for (int i = 0; i < 3; i++) {
+                    age[i] = Serial1.read();
+                }
+            }
+            Serial.print("Rock age: ");
+            Serial.println(age);
         }
-
-        Serial.print("Rock age: ");
-        Serial.println(age);
-
-        delay(1000);
     }
 }

@@ -1,4 +1,7 @@
 //Webpage to return when root is requested
+
+#include <webpage.h>
+
 const char webpage[] = \
 "<html>\
     <head>\
@@ -12,6 +15,10 @@ const char webpage[] = \
         <span id=\"magnetic\">\
             Scanning...\
         </span>\
+        Rock Age:\
+        <span id=\"age\">\
+            Scanning...\
+        </span>\
     </p>\
     <script>\
         var xhttp = new XMLHttpRequest();\
@@ -23,21 +30,13 @@ const char webpage[] = \
         function left() {xhttp.open(\"GET\", \"/L\"); xhttp.send();}\
         function right() {xhttp.open(\"GET\", \"/R\"); xhttp.send();}\
         function stop() {xhttp.open(\"GET\", \"/S\"); xhttp.send();}\
-        async function update_magnetic() {\
-            const response = await fetch(/magnetic);\
-            const direction = await response.text();\
-            if (direction == 1) {\
-                direction = \"UP\";\
-            }\
-            else if (direction == -1) {\
-                direction = \"DOWN\";\
-            }\
-            else {\
-                direction = \"NO FIELD DETECTED\";\
-            }\
-            document.getElementById(\"magnetic\").textContent = direction;\
+        async function update_data(data, scan_type) {\
+            const response = await fetch(data);\
+            const value = await response.text();\
+            document.getElementById(scan_type).textContent = value;\
         }\
-        setInterval(update_magnetic(), 1000);\
+        setInterval(update_data(\"/age\", \"age\"), 1000);\
+        setInterval(update_data(\"/magnetic\", \"magnetic\"), 1000);\
     </script>\
     <body>\
         <button class=\"btn\" onclick=\"ledOn()\">LED On</button>\
