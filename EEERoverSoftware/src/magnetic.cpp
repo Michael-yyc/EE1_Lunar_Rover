@@ -36,9 +36,7 @@ int average_reading() {
 int get_magnetic_baseline() {
     analogReadResolution(12);
     pinMode(mag_pin, INPUT);
-
     Serial.begin(115200);
-    while(!Serial) {};
 
     return average_reading();
 }
@@ -49,26 +47,14 @@ int get_magnetic_direction(int baseline) {
     int deviation = reading - baseline;
     float voltage = (reading * 3.3) / 4095.0; //converts binary ADC count to voltage between 0 - 3.3V
 
-    Serial.print("ADC: ");
-    Serial.print(reading);
-
-    Serial.print("  Voltage: ");
-    Serial.print(voltage, 3); //printed to 3 d.p
-
-    Serial.print("  Deviation: ");
-    Serial.print(deviation);
-
     //detect magnetic direction
     if (deviation > threshold) {
-        Serial.print("   --> MAGNETIC FIELD: DOWN");
         return -1;
     }
     else if (deviation < -threshold) {
-        Serial.print("   --> MAGNETIC FIELD: UP");
         return 1;
     }
     else {
-        Serial.print("   --> NO FIELD DETECTED");
         return 0;
     }
 }

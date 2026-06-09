@@ -9,8 +9,6 @@
 #include <radio.h>
 #include <magnetic.h>
 
-#include <basic_webpage.h>
-
 const char ssid[] = "AndroidAP";
 const char pass[] = "chizz12345678";
 const int groupNumber = 0; //only use to set IP address for EEERover network
@@ -25,7 +23,7 @@ extern int magnetic_baseline;
 
 //Return the web page
 void handleRoot() {
-    server.send(200, F("text/html"), webpage);
+    server.send(200, F("text/html"), basic_webpage);
 }
 
 //Switch LED on and acknowledge
