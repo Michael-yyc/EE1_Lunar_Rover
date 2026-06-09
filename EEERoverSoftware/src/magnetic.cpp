@@ -27,7 +27,6 @@ int average_reading() {
 
     for (int i = 0; i < num_samples; i++) {
         total += analogRead(mag_pin);
-        delay(1);
     }
 
     return total / num_samples;
@@ -47,9 +46,7 @@ int get_magnetic_baseline() {
 
 int get_magnetic_direction(int baseline) {
     int reading = average_reading();
-
     int deviation = reading - baseline;
-
     float voltage = (reading * 3.3) / 4095.0; //converts binary ADC count to voltage between 0 - 3.3V
 
     Serial.print("ADC: ");

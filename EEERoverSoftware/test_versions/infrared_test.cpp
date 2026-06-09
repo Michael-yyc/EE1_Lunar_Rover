@@ -59,5 +59,5 @@ void loop() {
     Serial.print("category -> ~");
     Serial.println(lambda);
 
-    delay(1000);
+    delay(500);
 }

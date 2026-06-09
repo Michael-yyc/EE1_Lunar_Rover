@@ -9,6 +9,7 @@
 #include <radio.h>
 #include <magnetic.h>
 
+#include <basic_webpage.h>
 
 const char ssid[] = "AndroidAP";
 const char pass[] = "chizz12345678";
@@ -41,7 +42,7 @@ void ledOFF() {
 
 void age_scan() {
     int age = get_age();
-    server.send(200, F("text/plain"), F(age));
+    server.send(200, F("text/plain"), F(""));
 }
 
 void magnetic_scan() {
@@ -123,7 +124,9 @@ void setup_server() {
     Serial.println(F(".local"));
 
     Serial.print(F("IP address: "));
-    Serial.println(WiFi.localIP());
+    Serial.print(F("http://"));
+    Serial.println(static_cast<IPAddress>(WiFi.localIP()));
+    Serial.println("(^if the host network name doesn't work, use this IP address)");
 }
 
 

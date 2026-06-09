@@ -3,7 +3,6 @@
 #include <magnetic.h>
 
 int magnetic_baseline, direction;
-
 HardwareSerial& UART_decoder = Serial1;
 
 void setup() {
