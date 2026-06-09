@@ -3,176 +3,189 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lunar Rover Dashboard</title>
+  <title>ZAMBAM Mission Control</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-
+<script src="script.js"></script>
 <body>
-  <main class="dashboard">
-    <header>
-      <div>
-        <p class="label">PROJECT ZAMBAM</p>
-        <h1>Live Rock Analyses</h1>
+  <main class="app-shell">
+
+    <!-- NAVBAR -->
+    <header class="top-bar">
+      <div class="brand-wrap">
+        <div class="moon-logo" aria-label="Moon logo">
+          <svg viewBox="0 0 100 100" role="img">
+            <circle cx="50" cy="50" r="28" class="moon-main"></circle>
+            <circle cx="62" cy="42" r="24" class="moon-cut"></circle>
+          </svg>
+        </div>
+
+        <div class="brand-text">
+          <h1>ZAMBAM</h1>
+          <p>ROCK GEOLOGICAL CLASSIFIER — MISSION CONTROL</p>
+        </div>
       </div>
 
-      <button id="connectButton">Connect</button>
+      <div class="top-status">
+        <div class="status-chip">
+          <span id="telemetryDot" class="top-dot telemetry-offline"></span>
+          <div>
+            <small>TELEMETRY</small>
+            <strong id="telemetryText">OFFLINE</strong>
+          </div>
+        </div>
+
+        <div class="motor-cluster">
+          <small>MOTORS</small>
+          <div class="motor-grid">
+            <div class="mini-motor"><span id="motorFLDot" class="top-dot status-off"></span><label>FL</label></div>
+            <div class="mini-motor"><span id="motorFRDot" class="top-dot status-off"></span><label>FR</label></div>
+            <div class="mini-motor"><span id="motorRLDot" class="top-dot status-off"></span><label>RL</label></div>
+            <div class="mini-motor"><span id="motorRRDot" class="top-dot status-off"></span><label>RR</label></div>
+          </div>
+        </div>
+
+        <div class="status-chip met-chip">
+          <div>
+            <small>MET</small>
+            <strong id="missionTime">00:00:00</strong>
+          </div>
+        </div>
+
+        <a class="stored-link" href="stored.html">Stored Rocks</a>
+      </div>
     </header>
 
-    <!-- AGE SECTION -->
-    <section class="section">
-      <h2 class="section-title">AGE Signal</h2>
+    <!-- MAIN GRID -->
+    <section class="main-grid">
 
-      <div class="age-panel">
-        <div>
-          <p class="mini-label">Connection Status</p>
-          <p id="ageStatus" class="status offline">Not Detected</p>
+      <!-- LEFT -->
+      <section class="panel type-panel">
+        <div class="panel-header">
+          <h2>TYPE</h2>
+          <span id="typeCount" class="badge">3 ACTIVE</span>
         </div>
 
-        <div>
-          <p class="mini-label">AGE Value</p>
-          <p id="ageValue" class="main-value">---</p>
+        <div class="classification-card">
+          <p class="classification-label">Current Classification</p>
+          <h3 id="rockType">---</h3>
+          <p class="classification-confidence">
+            Confidence: <span id="confidence">---</span>%
+          </p>
         </div>
-      </div>
+
+        <div class="sensor-block">
+          <div class="sensor-block-top">
+            <h4>INFRARED</h4>
+            <span id="irDot" class="signal-dot offline"></span>
+          </div>
+          <div class="sensor-value-box">
+            <span id="irValue" class="sensor-value">---</span>
+          </div>
+        </div>
+
+        <div class="sensor-block">
+          <div class="sensor-block-top">
+            <h4>ULTRASONIC</h4>
+            <span id="ultrasoundDot" class="signal-dot offline"></span>
+          </div>
+          <div class="sensor-value-box">
+            <span id="ultrasoundValue" class="sensor-value">---</span>
+          </div>
+        </div>
+
+        <div class="sensor-block">
+          <div class="sensor-block-top">
+            <h4>MAGNETIC FIELD</h4>
+            <span id="magneticDot" class="signal-dot offline"></span>
+          </div>
+          <div class="sensor-value-box">
+            <span id="magneticValue" class="sensor-value">---</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- MIDDLE -->
+      <section class="middle-column">
+        <section class="panel age-panel">
+          <div class="panel-header">
+            <h2>AGE</h2>
+            <span id="ageBadge" class="badge dim">INACTIVE</span>
+          </div>
+
+          <div class="age-main">
+            <h3 id="ageValue">---</h3>
+            <p class="age-meta">
+              Carrier: <span id="ageCarrier">---</span>
+              &nbsp;&nbsp;|&nbsp;&nbsp;
+              SNR: <span id="ageSnr">---</span>
+            </p>
+          </div>
+        </section>
+
+        <section class="panel drive-panel">
+          <div class="panel-header">
+            <h2>DRIVE SYSTEM</h2>
+            <span id="driveMode" class="badge">---</span>
+          </div>
+
+          <div class="drive-top">
+            <div class="joystick-shell">
+              <div class="joystick-ring">
+                <div id="joystickDot" class="joystick-dot"></div>
+              </div>
+            </div>
+
+            <div class="dpad">
+              <div></div>
+              <button class="arrow-btn">▲</button>
+              <div></div>
+
+              <button class="arrow-btn">◄</button>
+              <button class="stop-btn">STOP</button>
+              <button class="arrow-btn">►</button>
+
+              <div></div>
+              <button class="arrow-btn">▼</button>
+              <div></div>
+            </div>
+          </div>
+
+          <div class="drive-bars">
+            <div class="bar-row">
+              <span>THROTTLE</span>
+              <div class="bar-track"><div id="throttleBar" class="bar-fill"></div></div>
+              <strong id="throttleValue">0</strong>
+            </div>
+
+            <div class="steering-row">
+              <span>STEERING</span>
+              <div class="steering-track">
+                <div class="steering-center-line"></div>
+                <div id="steeringDot" class="steering-dot"></div>
+              </div>
+              <strong id="steeringValue">0</strong>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- RIGHT -->
+      <section class="right-column">
+        <section class="panel serial-panel">
+          <div class="panel-header">
+            <h2>SERIAL MONITOR</h2>
+            <span class="badge">115200 BAUD</span>
+          </div>
+
+          <pre id="serialLog">Waiting for ESP32 data...</pre>
+        </section>
+      </section>
     </section>
 
-    <!-- ROCK ANALYSIS SECTION -->
-    <section class="section">
-      <h2 class="section-title">Rock Type</h2>
-
-      <div class="sensor-grid">
-        <div class="sensor-card">
-          <h3>IR Signal</h3>
-          <p id="irStatus" class="status offline">Not Detected</p>
-          <p id="irValue" class="sensor-value">---</p>
-        </div>
-
-        <div class="sensor-card">
-          <h3>Ultrasound Signal</h3>
-          <p id="ultrasoundStatus" class="status offline">Not Detected</p>
-          <p id="ultrasoundValue" class="sensor-value">---</p>
-        </div>
-
-        <div class="sensor-card">
-          <h3>Magnetic Signal</h3>
-          <p id="magneticStatus" class="status offline">Not Detected</p>
-          <p id="magneticValue" class="sensor-value">---</p>
-        </div>
-      </div>
-
-      <div class="rock-result">
-        <p class="mini-label">Determined Rock Type</p>
-        <p id="rockType" class="rock-type">---</p>
-      </div>
-    </section>
-
-    <section class="section">
-  <div class="table-header">
-    <h2 class="section-title">Stored Rock Data</h2>
-    <button id="clearRocksButton">Clear Stored Data</button>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Rock ID</th>
-        <th>Age</th>
-        <th>Type</th>
-        <th>IR</th>
-        <th>Ultrasound</th>
-        <th>Magnetic</th>
-      </tr>
-    </thead>
-
-    <tbody id="rockTableBody">
-      <tr>
-        <td colspan="6" class="empty-table">No rocks stored yet</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-    <footer>
+    <footer class="footer-bar">
       Last Update: <span id="lastUpdate">---</span>
     </footer>
   </main>
-
-  <script>
-    const connectButton = document.getElementById("connectButton");
-    const lastUpdate = document.getElementById("lastUpdate");
-
-    connectButton.addEventListener("click", connectDevice);
-
-    async function connectDevice() {
-      if (!("serial" in navigator)) {
-        alert("Web Serial is not supported. Use Chrome or Edge.");
-        return;
-      }
-
-      try {
-        const port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 });
-
-        connectButton.textContent = "Connected";
-        connectButton.disabled = true;
-
-        const decoder = new TextDecoderStream();
-        port.readable.pipeTo(decoder.writable);
-
-        const reader = decoder.readable.getReader();
-        let buffer = "";
-
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-
-          buffer += value;
-
-          const lines = buffer.split("\n");
-          buffer = lines.pop();
-
-          for (const line of lines) {
-            handleData(line.trim());
-          }
-        }
-      } catch (error) {
-        alert("Connection failed: " + error.message);
-      }
-    }
-
-    function handleData(line) {
-      if (!line) return;
-
-      try {
-        const data = JSON.parse(line);
-
-        updateSignal("age", data.age);
-
-        updateSignal("ir", data.rock?.ir);
-        updateSignal("ultrasound", data.rock?.ultrasound);
-        updateSignal("magnetic", data.rock?.magnetic);
-
-        document.getElementById("rockType").textContent = data.rock?.type ?? "---";
-        lastUpdate.textContent = new Date().toLocaleTimeString();
-      } catch {
-        console.log("Invalid JSON:", line);
-      }
-    }
-
-    function updateSignal(name, signalData) {
-      const statusElement = document.getElementById(`${name}Status`);
-      const valueElement = document.getElementById(`${name}Value`);
-
-      if (!signalData || signalData.detected === false) {
-        statusElement.textContent = "Not Detected";
-        statusElement.className = "status offline";
-        valueElement.textContent = "---";
-        return;
-      }
-
-      statusElement.textContent = "Detected";
-      statusElement.className = "status online";
-      valueElement.textContent = signalData.value ?? "---";
-    }
-  </script>
 </body>
 </html>
