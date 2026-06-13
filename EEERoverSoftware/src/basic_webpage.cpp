@@ -30,11 +30,17 @@ function backward() {xhttp.open("GET", "/B");xhttp.send();}
 function left() {xhttp.open("GET", "/L");xhttp.send();}
 function right() {xhttp.open("GET", "/R");xhttp.send();}
 function stop() {xhttp.open("GET", "/S");xhttp.send();}
-async function updateMagnetic() {
+async function test() {
 try {
 const response = await fetch('/magnetic', { cache: 'no-store' });
 const text = await response.text();
-document.getElementById('magnetic').textContent = text;} 
-catch (error) {document.getElementById('magnetic').textContent = 'Error';}}
+if (text != "0") {
+document.getElementById('magnetic').textContent = text;
+}
+} catch (error) {
+document.getElementById('magnetic').textContent = 'Error';
+}
+}
+setInterval(test, 5000);
 </script>
 </html>)html";

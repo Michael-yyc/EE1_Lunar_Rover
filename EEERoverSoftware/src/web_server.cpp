@@ -8,9 +8,11 @@
 #include <motor_control.h>
 #include <radio.h>
 #include <magnetic.h>
+#include <infrared.h>
+#include <ultrasound.h>
 
-const char ssid[] = "AndroidAP";
-const char pass[] = "chizz12345678";
+const char ssid[] = "RoverAP";
+const char pass[] = "password123";
 const int groupNumber = 0; //only use to set IP address for EEERover network
 const char hostname[] = "ZAMBAM";
 
@@ -19,11 +21,9 @@ WiFiWebServer server(80);
 WiFiUDP udp;
 MDNS mdns(udp);
 
-extern int magnetic_baseline;
-
 //Return the web page
 void handleRoot() {
-    server.send(200, F("text/html"), basic_webpage);
+    server.send(200, F("text/html"), plan_z);
 }
 
 //Switch LED on and acknowledge
@@ -32,19 +32,32 @@ void ledON() {
     server.send(200, F("text/plain"), F("ON"));
 }
 
-//Switch LED on and acknowledge
+//Switch LED off and acknowledge
 void ledOFF() {
     digitalWrite(LED_BUILTIN,0);
     server.send(200, F("text/plain"), F("OFF"));
 }
 
+//
+void STATE() {
+    int raw = analogRead(A0);
+    float voltage = raw * (3.3/1023);
+    const int threshold = 1.65;
+    if (voltage < threshold) {
+        server.send(200, F("text/plain"), F("OFF"));
+    }
+    else {
+        server.send(200, F("text/plain"), F("ON"));
+    }
+}
+
 void age_scan() {
     int age = get_age();
-    server.send(200, F("text/plain"), F(""));
+    server.send(200, F("text/plain"), String(age));
 }
 
 void magnetic_scan() {
-    int field = get_magnetic_direction(magnetic_baseline);
+    int field = get_magnetic_direction();
 
     if (field == 1) {
         server.send(200, F("text/plain"), F("UP"));
@@ -54,6 +67,28 @@ void magnetic_scan() {
     }
     else {
         server.send(200, F("text/plain"), F("NO FIELD DETECTED"));
+    }
+}
+
+void IR_scan() {
+    int lambda = get_pulse_rate();
+
+    if (lambda != 0) {
+        server.send(200, F("text/plain"), String(lambda));
+    }
+    else {
+        server.send(200, F("text/plain"), F("N/A"));
+    }
+}
+
+void US_scan() {
+    bool US_present = get_US_status();
+    
+    if (US_present) {
+        server.send(200, F("text/plain"), F("DETECTED"));
+    }
+    else {
+        server.send(200, F("text/plain"), F("NOT DETECTED"));
     }
 }
 
@@ -102,6 +137,7 @@ void setup_server() {
 
     //Register the callbacks to respond to HTTP requests
     server.on(F("/"), handleRoot);
+    server.on(F("/state"), STATE);
     server.on(F("/on"), ledON);
     server.on(F("/off"), ledOFF);
     server.on(F("/F"), forward);
@@ -111,6 +147,8 @@ void setup_server() {
     server.on(F("/S"), stop);
     server.on(F("/age"), age_scan);
     server.on(F("/magnetic"), magnetic_scan);
+    server.on(F("/IR"), IR_scan);
+    server.on(F("/US"), US_scan);
     server.onNotFound(handleNotFound);
 
     server.begin();

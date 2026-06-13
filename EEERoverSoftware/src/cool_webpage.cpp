@@ -1,0 +1,102 @@
+// Webpage to return when root is requested
+
+#include <webpage.h>
+
+const char cool_webpage[] =
+R"html(<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZAMBAM Mission Control</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<script src="script.js"></script>
+<body>
+<main class="app-shell">
+<!-- NAVBAR -->
+<header class="top-bar">
+<div class="brand-wrap">
+<div class="moon-logo" aria-label="Moon logo">
+<svg viewBox="0 0 100 100" role="img">
+<circle cx="50" cy="50" r="28" class="moon-main"></circle>
+<circle cx="62" cy="42" r="24" class="moon-cut"></circle>
+</svg>
+</div>
+<div class="brand-text">
+<h1>ZAMBAM</h1>
+<p>ROCK GEOLOGICAL CLASSIFIER — MISSION CONTROL</p>
+</div>
+</div>
+<div class="top-status">
+<div class="status-chip">
+<span id="telemetryDot" class="top-dot telemetry-offline"></span>
+<div>
+<small>TELEMETRY</small>
+<strong id="telemetryText">OFFLINE</strong>
+</div>
+</div>
+<div class="motor-cluster">
+<small>MOTORS</small>
+<div class="motor-grid">
+<div class="mini-motor"><span id="motorFLDot" class="top-dot status-off"></span><label>FL</label></div>
+<div class="mini-motor"><span id="motorFRDot" class="top-dot status-off"></span><label>FR</label></div>
+<div class="mini-motor"><span id="motorRLDot" class="top-dot status-off"></span><label>RL</label></div>
+<div class="mini-motor"><span id="motorRRDot" class="top-dot status-off"></span><label>RR</label></div>
+</div>
+</div>
+<div class="status-chip met-chip">
+<div>
+<small>MET</small>
+<strong id="missionTime">00:00:00</strong>
+</div>
+</div>
+<a class="stored-link" href="stored.html">Stored Rocks</a>
+</div>
+</header>
+<!-- MAIN GRID -->
+<section class="main-grid">
+<!-- LEFT -->
+<section class="panel type-panel">
+<div class="panel-header">
+<h2>TYPE</h2>
+<span id="typeCount" class="badge">3 ACTIVE</span>
+</div>
+<div class="classification-card">
+<p class="classification-label">Current Classification</p>
+<h3 id="rockType">---</h3>
+<p class="classification-confidence">
+Confidence: <span id="confidence">---</span>%
+</p>
+</div>
+<div class="sensor-block">
+<div class="sensor-block-top">
+<h4>INFRARED</h4>
+<span id="irDot" class="signal-dot offline"></span>
+</div>
+<div class="sensor-value-box">
+<span id="irValue" class="sensor-value">---</span>
+</div>
+</div>
+<div class="sensor-block">
+<div class="sensor-block-top">
+<h4>ULTRASONIC</h4>
+<span id="ultrasoundDot" class="signal-dot offline"></span>
+</div>
+<div class="sensor-value-box">
+<span id="ultrasoundValue" class="sensor-value">---</span>
+</div>
+</div>
+<div class="sensor-block">
+<div class="sensor-block-top">
+<h4>MAGNETIC FIELD</h4>
+<span id="magneticDot" class="signal-dot offline"></span>
+</div>
+<div class="sensor-value-box">
+<span id="magnetic" class="sensor-value">---</span>
+</div>
+</div>
+</section>
+</main>
+</body>
+</html>)html";

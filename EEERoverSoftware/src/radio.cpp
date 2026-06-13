@@ -22,26 +22,34 @@ Features:
 extern HardwareSerial& UART_decoder;
 
 int get_age() {
-    char c = '\0';
-    char age[4];
+    static int last_age = 0;
+    
+    if (UART_decoder.available()) {
+        char c = '\0';
+        char age[4];
 
-    age[3] = c;
+        age[3] = c;
 
-    while (UART_decoder.available() && c != '#') {
-        c = UART_decoder.read();
+        while (c != '#') {
+            c = UART_decoder.read();
 
-        if (c == '#') {
-            while (UART_decoder.available() < 3) {}; //wait until 3 bytes have been decoded
+            if (c == '#') {
+                while (UART_decoder.available() < 3) {}; //wait until 3 bytes have been decoded
 
-            for (int i = 0; i < 3; i++) {
-                age[i] = UART_decoder.read();
+                for (int i = 0; i < 3; i++) {
+                    age[i] = UART_decoder.read();
+                }
             }
         }
+
+        Serial.print("Rock age: ");
+        Serial.println(age);
+
+        int age_int = atoi(age);
+        last_age = atoi(age);
+        return age_int;
     }
-
-    Serial.print("Rock age: ");
-    Serial.println(age);
-
-    int age_int = atoi(age);
-    return age_int;
+    else {
+        return last_age;
+    }
 }

@@ -17,9 +17,10 @@ Features:
 #include <Arduino.h>
 #include <magnetic.h>
 
-const int mag_pin = A0;
 const int num_samples = 100; // averaging amount
-const int threshold = 125; // sensitivity threshold (ADC counts) -> ~ 0.1V
+const int threshold = 37; // sensitivity threshold (ADC counts) -> ~ 0.03V
+
+int magnetic_baseline;
 
 // function to average 100 readings
 int average_reading() {
@@ -33,19 +34,21 @@ int average_reading() {
 }
 
 
-int get_magnetic_baseline() {
+void get_magnetic_baseline() {
     analogReadResolution(12);
-    pinMode(mag_pin, INPUT);
-    Serial.begin(115200);
-
-    return average_reading();
+    magnetic_baseline = average_reading();
 }
 
 
-int get_magnetic_direction(int baseline) {
+int get_magnetic_direction() {
     int reading = average_reading();
-    int deviation = reading - baseline;
+    int deviation = reading - magnetic_baseline;
+
     float voltage = (reading * 3.3) / 4095.0; //converts binary ADC count to voltage between 0 - 3.3V
+    Serial.print("Baseline: ");
+    Serial.print(magnetic_baseline);
+    Serial.print("   Voltage: ");
+    Serial.println(voltage);
 
     //detect magnetic direction
     if (deviation > threshold) {
